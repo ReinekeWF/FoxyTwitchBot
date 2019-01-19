@@ -5,16 +5,46 @@ import config
 
 HOST = "irc.chat.twitch.tv"
 PORT = 6667
-NICK = "KleinerFuchsBot"
+NICK = "kleinerfuchsbot"
 PASS = config.oauth()
 
-CHANNEL = 'reinekewf'
+CHANNEL = input('Channel name eingeben: ')
 
-
-'''
-r = requests.get('http://tmi.twitch.tv/group/user/gronkh/chatters')
+r = requests.get('http://tmi.twitch.tv/group/user/' + CHANNEL + '/chatters')
 r.encoding
-'''
+test = r.json()
+banned = {'bots':['freast',
+                    'nightbot',
+                    'commanderroot',
+                    'apricotdrupefruit',
+                    'electricallongboard',
+                    'host_giveaway',
+                    'p0lizei_',
+                    'p0sitivitybot',
+                    'skinnyseahorse',
+                    'slocool',
+                    'activeenergy',
+                    'moobot']}
+
+listBanned = banned['bots']
+listViewer = test['chatters']['viewers']
+
+listMods = test['chatters']['moderators']
+listVips = test['chatters']['vips']
+
+
+# loescht alle Bots und co
+for i in listBanned:
+    if i in listViewer:
+
+        listViewer.remove(i)
+
+    if i in listMods:
+
+        listMods.remove(i)
+    if i in listVips:
+
+        listVips.remove(i)
 
 
 s = socket.socket()
@@ -28,9 +58,12 @@ try:
     print("Erfolgreiche Verbindung zu Channel " + CHANNEL)
 
 except:
-    print('fehler')
+    print('fehler beim login')
 
-while True:
-    time.sleep(3)
-    print('send')
-    send_message('hallo ich bin ein fuchsiger bot!! =^.^=')
+
+print('send')
+#send_message('hallo ich bin ein fuchsiger bot!! =^.^=')
+print('spieler anzahl' + str(len(listViewer)))
+for viewer in listViewer:
+    print(viewer)
+print('es sind ' + str(len(listViewer)) + ' Viewer im Chat')
