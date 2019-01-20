@@ -10,6 +10,8 @@ PASS = config.oauth()
 
 CHANNEL = input('Channel name eingeben: ')
 
+listCommands = ['!loben','!commands']
+
 r = requests.get('http://tmi.twitch.tv/group/user/' + CHANNEL + '/chatters')
 r.encoding
 test = r.json()
@@ -47,6 +49,8 @@ for i in listBanned:
 s = socket.socket()
 def send_message(message):
     s.send(bytes("PRIVMSG #" + CHANNEL + " :" + message + "\r\n", "UTF-8"))
+    print(NICK + ': ' +message)
+
 try:
     s.connect((HOST, PORT))
     s.send(bytes("PASS " + PASS + "\r\n", "UTF-8"))
@@ -59,12 +63,18 @@ except:
 
 
 print('send')
-send_message('hallo  =^.^=')
+#send_message('hallo  =^.^=')
 print('spieler anzahl' + str(len(listViewer)))
 for viewer in listViewer:
     print(viewer)
 print('es sind ' + str(len(listViewer)) + ' Viewer im Chat')
+
+startTime = time.time()
 while True:
+    #if (time.time() - startTime) >= 10:
+    #    send_message('TimerTest')
+    #    startTimet = time.time()
+
     #chat = str(s.recv(1024)).split('\\r\\n')
     for line in str(s.recv(1024)).split('\\r\\n'):
         parts = line.split(':')
@@ -85,3 +95,18 @@ while True:
             print(parts[2])
         if message == '17':
             send_message('was 17? 17 Apfel?')
+        if 'meister' in message:
+            send_message("Mein Meister ist ReinekeWF!")
+            print(parts[2])
+
+# hier sind die Commands zuhause
+        if '!commands' in message:
+            command = ' | '.join(listCommands)
+            send_message(command)
+        if '!loben' in message:
+            send_message('Fuchsi fühlt sich gelobt! =^.^=')
+
+        if '!exit' in message:
+            send_message('Tschüss')
+            s.shutdown(1)
+            exit()
