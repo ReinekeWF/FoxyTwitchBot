@@ -36,14 +36,11 @@ listVips = test['chatters']['vips']
 # loescht alle Bots und co
 for i in listBanned:
     if i in listViewer:
-
         listViewer.remove(i)
 
     if i in listMods:
-
         listMods.remove(i)
     if i in listVips:
-
         listVips.remove(i)
 
 
@@ -62,8 +59,29 @@ except:
 
 
 print('send')
-#send_message('hallo ich bin ein fuchsiger bot!! =^.^=')
+send_message('hallo  =^.^=')
 print('spieler anzahl' + str(len(listViewer)))
 for viewer in listViewer:
     print(viewer)
 print('es sind ' + str(len(listViewer)) + ' Viewer im Chat')
+while True:
+    #chat = str(s.recv(1024)).split('\\r\\n')
+    for line in str(s.recv(1024)).split('\\r\\n'):
+        parts = line.split(':')
+        if len(parts) < 3:
+            continue
+
+        if "QUIT" not in parts[1] and "JOIN" not in parts[1] and "PART" not in parts[1]:
+            message = parts[2][:len(parts[2])]
+
+
+        usernamesplit = parts[1].split("!")
+        username = usernamesplit[0]
+
+        print(username + ": " + message)
+
+        if 'test' in message:
+            send_message("hallo")
+            print(parts[2])
+        if message == '17':
+            send_message('was 17? 17 Apfel?')
