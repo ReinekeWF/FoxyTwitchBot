@@ -50,11 +50,31 @@ geschenke = ['eine Rose',
 
             ]
 
+listCommands = ['!loben', '!commands', '!geschenk <zu beschenknder user>', '!git', '!Meister', '!Hype']
+
 zufälligeNachrichten = [
     'Fuchsi ist Langweilig -.-',
     'ist keiner mehr da?',
     'Fuchsi ist traurig alle schweigen -.-',
 ]
+
+KeyWords = {
+    '17' : 'Was 17? 17 Apfel?',
+    'test ' : ('Test zurück','test 2'),
+    'python ' : 'Was ist Python? Laufe ich etwar auf Python? ... Könnte gut sein =^.^=',
+    'schei\\xc3\\x9fe ' : ('Nanana das sagt man doch nicht!','Du Ferkel geh und wasch dir den den Mund'),
+    'gut und dir?' : ('Mir geht es heute wunderbar Danke das du fragst =^.^=',
+                      'Joa kann mich nicht beschweren',
+                      'Alle Systeme einstatz bereit!',
+                      'Naja könnte Besser sein',
+                      'Schön mir nicht'),
+    'nicht antworten ' : 'Nicht drauf zu antworten ist aber unhöflich',
+    'edge' : 'Livin On The Edge by Aerosmith',
+    'http:' : ('Fuchsi mag Links Wolfform','Hmmm ein Link! Oder doch lieber Selda?')
+
+    }
+
+
 cooldown = 0
 lastmessage = ""
 timerold = 0
