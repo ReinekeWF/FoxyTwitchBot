@@ -15,6 +15,8 @@ PASS = config.oauth()
 CHANNEL = input('Channel name eingeben: ')
 
 listCommands = ['!loben', '!commands']
+message = ''
+chat = ''
 
 # pygame.init()
 # pygame.font.init()
@@ -26,7 +28,7 @@ s = socket.socket()
 
 def viewer():
     r = requests.get('http://tmi.twitch.tv/group/user/' + CHANNEL + '/chatters')
-    r.encoding
+    # r.encoding
     test = r.json()
     banned = {'bots': ['freast',
                        'nightbot',
