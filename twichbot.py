@@ -6,29 +6,49 @@ import config
 # import pygame
 # import tkinter
 
-
-HOST = "irc.chat.twitch.tv"
-PORT = 6667
-NICK = "kleinerfuchsbot"
-PASS = config.oauth()
-
-CHANNEL = input('Channel name eingeben: ')
-
 listCommands = ['!loben', '!commands']
 message = ''
 chat = ''
+zeit = 0
 
-# pygame.init()
-# pygame.font.init()
-# font = pygame.font.Font('C:/Windows/Fonts/verdana.ttf',18)
-# fenster = pygame.display.set_mode((400,800))
 
-s = socket.socket()
+def login():
+    HOST = "irc.chat.twitch.tv"
+    PORT = 6667
+    NICK = "kleinerfuchsbot"
+    PASS = config.oauth()
+
+    ChannelList = ['artimus83','noobdevtv','reinekewf','traumfalke','tinylittlestudio','tutorexilius','propanben','gplay97','lifeoffranky','vectordex','lukascode','s0pht']
+    channelZaler = 0
+    stellen = 5
+    for Channel in ChannelList:
+        if channelZaler == 10:
+            stellen -=1
+        print(str(channelZaler) + ' ' * (stellen) + Channel)
+        channelZaler += 1
+    auswahl = input('Channel name eingeben: ')
+    try:
+        CHANNEL = ChannelList[int(auswahl)]
+    except:
+        CHANNEL = auswahl
+
+
+
+    try:
+        s.connect((HOST, PORT))
+        s.send(bytes("PASS " + PASS + "\r\n", "UTF-8"))
+        s.send(bytes("NICK " + NICK + "\r\n", "UTF-8"))
+        s.send(bytes("JOIN #" + CHANNEL + " \r\n", "UTF-8"))
+        print("Erfolgreiche Verbindung zu Channel " + CHANNEL)
+
+    except:
+        print('fehler beim login')
+    return CHANNEL
 
 
 def viewer():
     r = requests.get('http://tmi.twitch.tv/group/user/' + CHANNEL + '/chatters')
-    # r.encoding
+    #r.encoding
     test = r.json()
     banned = {'bots': ['freast',
                        'nightbot',
@@ -83,28 +103,30 @@ def reconnect():
 
 
 def send_message(message):
-    try:
-        s.send(bytes("PRIVMSG #" + CHANNEL + " :" + message + "\r\n", "UTF-8"))
-        print(NICK + ': ' + message)
-    except:
-        reconnect()
+    if zeit > time.time():
+        print('Fuchsi mus still bleiben')
+    else:
+        try:
+            s.send(bytes("PRIVMSG #" + CHANNEL + " :" + message + "\r\n", "UTF-8"))
+            print(NICK + ': ' + message)
+        except:
+            reconnect()
 
 
-try:
-    s.connect((HOST, PORT))
-    s.send(bytes("PASS " + PASS + "\r\n", "UTF-8"))
-    s.send(bytes("NICK " + NICK + "\r\n", "UTF-8"))
-    s.send(bytes("JOIN #" + CHANNEL + " \r\n", "UTF-8"))
-    print("Erfolgreiche Verbindung zu Channel " + CHANNEL)
+# pygame.init()
+# pygame.font.init()
+# font = pygame.font.Font('C:/Windows/Fonts/verdana.ttf',18)
+# fenster = pygame.display.set_mode((400,800))
 
-except:
-    print('fehler beim login')
+s = socket.socket()
 
 # send_message('Hallo der Bottige Fuchsi ist nun Online =^.^=')
 startTime = time.time()
 # viewerlist = []
 # viewerlist.append(viewer())
 
+
+CHANNEL = login()
 viewer()
 while True:
     # if (time.time() - startTime) >= 60 * 5:
@@ -139,7 +161,7 @@ while True:
             send_message("Hallo " + username + ' wie gehts dir?')
 
         if 'Minecraft' in message or 'minecraft' in message:
-            send_message('Ssssssssir Ssssteve')
+            send_message('Ssssssssir ' + username + ' Wassss geht? =^.^=')
 
         if '17' in message:
             send_message('was 17? 17 Apfel?')
@@ -165,6 +187,11 @@ while True:
             send_message(command)
         if '!loben' in message:
             send_message('Fuchsi fühlt sich gelobt! =^.^=')
+
+        # Hier sind die hidden Commands zuhause
+        if '!sendepause' in message:
+            zeit = (int(message.split()[1]) + round(time.time()))
+            s.send(bytes("PRIVMSG #" + CHANNEL + " :" + 'Ok Fuchsi ist still für ' + message.split()[1] + 'sekunden' + "\r\n", "UTF-8"))
 
         if message == '!exit':
             send_message('Tschüss')
