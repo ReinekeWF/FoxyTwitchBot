@@ -11,23 +11,22 @@ message = ''
 chat = ''
 zeit = 0
 
-HOST = "irc.chat.twitch.tv"
-PORT = 6667
-NICK = "kleinerfuchsbot"
-PASS = config.oauth()
+HOST = config.host
+PORT = config.port
+NICK = config.nick
+PASS = config.oauth
 
 def login():
-    ChannelList = ['artimus83','noobdevtv','reinekewf','traumfalke','tinylittlestudio','tutorexilius','propanben','gplay97','lifeoffranky','vectordex','lukascode','s0pht']
     channelZaler = 0
     stellen = 5
-    for Channel in ChannelList:
+    for Channel in config.ChannelList:
         if channelZaler == 10:
             stellen -=1
         print(str(channelZaler) + ' ' * (stellen) + Channel)
         channelZaler += 1
     auswahl = input('Channel name eingeben: ')
     try:
-        CHANNEL = ChannelList[int(auswahl)]
+        CHANNEL = config.ChannelList[int(auswahl)]
     except:
         CHANNEL = auswahl
 
@@ -49,22 +48,7 @@ def viewer():
     r = requests.get('http://tmi.twitch.tv/group/user/' + CHANNEL + '/chatters')
     #r.encoding
     test = r.json()
-    banned = {'bots': ['freast',
-                       'nightbot',
-                       'commanderroot',
-                       'apricotdrupefruit',
-                       'electricallongboard',
-                       'host_giveaway',
-                       'p0lizei_',
-                       'p0sitivitybot',
-                       'skinnyseahorse',
-                       'slocool',
-                       'activeenergy',
-                       'moobot',
-                       'energyzbot',
-                       'kleinerfuchsbot'
-
-                       ]}
+    banned = {'bots': config.bots}
 
     listBanned = banned['bots']
     listViewer = test['chatters']['viewers']
