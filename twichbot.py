@@ -11,13 +11,12 @@ message = ''
 chat = ''
 zeit = 0
 
+HOST = "irc.chat.twitch.tv"
+PORT = 6667
+NICK = "kleinerfuchsbot"
+PASS = config.oauth()
 
 def login():
-    HOST = "irc.chat.twitch.tv"
-    PORT = 6667
-    NICK = "kleinerfuchsbot"
-    PASS = config.oauth()
-
     ChannelList = ['artimus83','noobdevtv','reinekewf','traumfalke','tinylittlestudio','tutorexilius','propanben','gplay97','lifeoffranky','vectordex','lukascode','s0pht']
     channelZaler = 0
     stellen = 5
