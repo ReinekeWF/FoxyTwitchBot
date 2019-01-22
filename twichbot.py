@@ -149,7 +149,7 @@ while True:
             continue
 
         if "QUIT" not in parts[1] and "JOIN" not in parts[1] and "PART" not in parts[1]:
-            message = parts[2][:len(parts[2])]
+            message = parts[2][:len(parts[2])].lower()
 
         usernamesplit = parts[1].split("!")
         username = usernamesplit[0]
@@ -159,7 +159,7 @@ while True:
         if 'hallo' in message or 'moin' in message or 'Hallo' in message or 'Moin' in message:
             send_message("Hallo " + username + ' wie gehts dir?')
 
-        if 'Minecraft' in message or 'minecraft' in message:
+        if 'minecraft' in message:
             send_message('Ssssssssir ' + username + ' Wassss geht? =^.^=')
 
         if '17' in message:
@@ -175,11 +175,13 @@ while True:
             send_message('naanana das sagt man nicht!')
 
         if 'python' in message:
-            send_message('was ist python?')
+            send_message('was ist Python? Laufe ich etwar auf Python? ... Könnte gut sein =^.^=')
 
         if 'nicht antworten' in message:
             send_message('nicht antworten finde ich unhöflich!')
 
+        if 'edge' in message:
+            send_message('Livin On The Edge by Aerosmith 🤪 ')
         # hier sind die Commands zuhause
         if '!commands' in message:
             command = ' | '.join(listCommands)
