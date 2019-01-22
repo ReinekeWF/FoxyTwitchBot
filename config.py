@@ -22,6 +22,7 @@ ChannelList = ['artimus83',
 # Twitchbots
 bots = ['freast',
         'nightbot',
+        '',
         'commanderroot',
         'apricotdrupefruit',
         'electricallongboard',
