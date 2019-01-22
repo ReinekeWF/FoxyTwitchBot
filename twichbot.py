@@ -154,7 +154,7 @@ while True:
         usernamesplit = parts[1].split("!")
         username = usernamesplit[0]
 
-        print(username + ": " + message)
+        print(time.strftime('%H:%M:%S >>> ') + username + ": " + message)
 
         if 'hallo' in message or 'moin' in message or 'Hallo' in message or 'Moin' in message:
             send_message("Hallo " + username + ' wie gehts dir?')
