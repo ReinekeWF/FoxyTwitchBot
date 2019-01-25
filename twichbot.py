@@ -2,11 +2,14 @@ import time
 import socket
 import requests
 import config
+import random
+
 
 # import pygame
 # import tkinter
 
-listCommands = ['!loben', '!commands']
+
+listCommands = ['!loben', '!commands', '!geschenk <zu beschenknder user>']
 message = ''
 chat = ''
 zeit = 0
@@ -45,6 +48,12 @@ def login():
     return CHANNEL
 
 
+def geschenk():
+    geschenke = config.geschenke
+    auswahl = random.randrange(0,len(geschenke) - 1)
+    return geschenke[auswahl]
+
+
 def viewer():
     r = requests.get('http://tmi.twitch.tv/group/user/' + CHANNEL + '/chatters')
     #r.encoding
@@ -80,8 +89,11 @@ def viewer():
 def reconnect():
     s.close()
     s.connect((HOST, PORT))
+    time.sleep(0.05)
     s.send(bytes("PASS " + PASS + "\r\n", "UTF-8"))
+    time.sleep(0.05)
     s.send(bytes("NICK " + NICK + "\r\n", "UTF-8"))
+    time.sleep(0.05)
     s.send(bytes("JOIN #" + CHANNEL + " \r\n", "UTF-8"))
     print("Erfolgreiche Verbindung zu Channel " + CHANNEL)
 
@@ -104,7 +116,6 @@ def send_message(message):
 
 s = socket.socket()
 
-# send_message('Hallo der Bottige Fuchsi ist nun Online =^.^=')
 startTime = time.time()
 # viewerlist = []
 # viewerlist.append(viewer())
@@ -112,8 +123,11 @@ startTime = time.time()
 
 CHANNEL = login()
 #send_message('Hallo der Bottige Fuchsi ist nun Online =^.^= ')
+time.sleep(0.05)
 s.send(bytes("CAP REQ :twitch.tv/membership" + "\r\n", "UTF-8"))
+time.sleep(0.05)
 s.send(bytes("CAP REQ :twitch.tv/tags" + "\r\n", "UTF-8"))
+time.sleep(0.05)
 s.send(bytes("CAP REQ :twitch.tv/commands" + "\r\n", "UTF-8"))
 viewer()
 while True:
@@ -148,41 +162,44 @@ while True:
 
         print(time.strftime('%H:%M:%S >>> ') + username + ": " + message)
 
-        if 'hallo' in message or 'moin' in message or 'Hallo' in message or 'Moin' in message:
+        if 'hallo ' in message or 'moin ' in message or 'hi ' in message or 'huhu ' in message:
             send_message("Hallo " + username + ' wie gehts dir?')
 
         if 'minecraft' in message:
             send_message('Ssssssssir ' + username + ' Wassss geht? =^.^=')
 
-        if '17' in message:
+        if '17 ' in message:
             send_message('was 17? 17 Apfel?')
 
-        if 'meister' in message and 'kleinerfuchsbot' in message:
+        if 'meister ' in message and 'kleinerfuchsbot' in message:
             send_message("Mein Meister ist ReinekeWF!")
 
-        if 'gut und dir' in message:
+        if 'gut und dir ' in message:
             send_message('gut und dir?')
 
-        if 'schei\\xc3\\x9fe' in message:
+        if 'schei\\xc3\\x9fe ' in message:
             send_message('naanana das sagt man nicht!')
 
-        if 'python' in message:
+        if 'python ' in message:
             send_message('was ist Python? Laufe ich etwar auf Python? ... Könnte gut sein =^.^=')
 
-        if 'nicht antworten' in message:
+        if 'nicht antworten ' in message:
             send_message('nicht antworten finde ich unhöflich!')
 
-        if 'edge' in message:
+        if 'edge ' in message:
             send_message('Livin On The Edge by Aerosmith 🤪 ')
         # hier sind die Commands zuhause
-        if '!commands' in message:
+        if '!commands ' in message:
             command = ' | '.join(listCommands)
             send_message(command)
-        if '!loben' in message:
+        if '!loben ' in message:
             send_message('/me Fuchsi fühlt sich gelobt! =^.^=')
+        if '!geschenk ' in message:
+            beschenkter = message.split(' ')[1]
+            send_message(username + ' schenkt ' + geschenk() + ' an ' + beschenkter)
 
         # Hier sind die hidden Commands zuhause
-        if '!sendepause' in message:
+        if '!sendepause ' in message:
             zeit = (int(message.split()[1]) + round(time.time()))
             s.send(bytes("PRIVMSG #" + CHANNEL + " :" + 'Ok Fuchsi ist still für ' + message.split()[1] + 'sekunden' + "\r\n", "UTF-8"))
 
