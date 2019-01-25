@@ -10,6 +10,7 @@ listCommands = ['!loben', '!commands']
 message = ''
 chat = ''
 zeit = 0
+username = 'Twich'
 
 HOST = config.host
 PORT = config.port
@@ -110,6 +111,10 @@ startTime = time.time()
 
 
 CHANNEL = login()
+#send_message('Hallo der Bottige Fuchsi ist nun Online =^.^= ')
+s.send(bytes("CAP REQ :twitch.tv/membership" + "\r\n", "UTF-8"))
+s.send(bytes("CAP REQ :twitch.tv/tags" + "\r\n", "UTF-8"))
+s.send(bytes("CAP REQ :twitch.tv/commands" + "\r\n", "UTF-8"))
 viewer()
 while True:
     # if (time.time() - startTime) >= 60 * 5:
@@ -135,8 +140,11 @@ while True:
         if "QUIT" not in parts[1] and "JOIN" not in parts[1] and "PART" not in parts[1]:
             message = parts[2][:len(parts[2])].lower()
 
-        usernamesplit = parts[1].split("!")
-        username = usernamesplit[0]
+        zaeler = 0
+        for object in parts[0].split(';'):
+            if 'display-name' in object:
+                username = object.split('=')[1]
+            zaeler += 1
 
         print(time.strftime('%H:%M:%S >>> ') + username + ": " + message)
 
@@ -171,7 +179,7 @@ while True:
             command = ' | '.join(listCommands)
             send_message(command)
         if '!loben' in message:
-            send_message('Fuchsi fühlt sich gelobt! =^.^=')
+            send_message('/me Fuchsi fühlt sich gelobt! =^.^=')
 
         # Hier sind die hidden Commands zuhause
         if '!sendepause' in message:
