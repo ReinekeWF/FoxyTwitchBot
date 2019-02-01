@@ -164,10 +164,10 @@ while True:
             #if "QUIT" not in parts[0] and "JOIN" not in parts[0] and "PART" not in parts[0]:
 
 
-            if not message == '' and message != "'":
-                print(time.strftime('%H:%M:%S >>> ') + username + ": " + message)
-            else:
+            if not line == "'" or not 'PING' in line:
                 print(line)
+            else:
+                print(time.strftime('%H:%M:%S >>> ') + username + ": " + message)
 
             if 'hallo ' in message or 'moin ' in message or 'hi ' in message or 'huhu ' in message:
                 '''
