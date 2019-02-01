@@ -14,6 +14,7 @@ chat = ''
 zeit = 0
 username = 'Twich'
 meta = ''
+oldchat = ''
 
 HOST = config.host
 PORT = config.port
@@ -141,93 +142,98 @@ while True:
         chat = str(s.recv(1024)).split('\\r\\n')
     except:
         reconnect()
+    if chat != oldchat:
+        oldchat = chat
+        for line in chat:
+            if "PRIVMSG #" in line:
+                parts = line.split('PRIVMSG #' + CHANNEL + ' :')
+                if len(parts) >= 2:
+                    meta = parts[0]
+                    message = parts[1].lower()
+                    #print(parts[1])
+                    zaeler = 0
+                    for object in meta.split(';'):
+                        if 'display-name' in object:
+                            username = object.split('=')[1]
+                        zaeler += 1
 
-    for line in chat:
-        parts = line.split('PRIVMSG #' + CHANNEL + ' :')
-        if 'PING' in line:
-            s.send(bytes("PONG :tmi.twitch.tv  \r\n", "UTF-8"))
-            print('PONG')
+            if 'PING' in line:
+                s.send(bytes("PONG :tmi.twitch.tv  \r\n", "UTF-8"))
+                print('PONG')
 
-        if len(parts) >= 2:
-            meta = parts[0]
-            message = parts[1].lower()
-            print(parts[1])
-        else:
-            print(parts)
+            #if "QUIT" not in parts[0] and "JOIN" not in parts[0] and "PART" not in parts[0]:
 
-        # if "QUIT" not in parts[0] and "JOIN" not in parts[0] and "PART" not in parts[0]:
 
-        zaeler = 0
-        for object in meta.split(';'):
-            if 'display-name' in object:
-                username = object.split('=')[1]
-            zaeler += 1
-
-        print(time.strftime('%H:%M:%S >>> ') + username + ": " + message)
-
-        if 'hallo ' in message or 'moin ' in message or 'hi ' in message or 'huhu ' in message:
-            '''
-            aktuellviewer = viewer()
-            newlistviewer =[]
-            for name in aktuellviewer:
-                namex = str(name).lower()
-                newlistviewer.append(namex)
-            print(newlistviewer)
-            if newlistviewer in message:
-                for name in newlistviewer:
-                    print(name)
-                    if name in message:
-                        user = namex
-                        break
-                send_message("Hallo " + user + ' wie gehts dir?')
+            if not message == '' and message != "'":
+                print(time.strftime('%H:%M:%S >>> ') + username + ": " + message)
+                message
+                #a = 0
             else:
+                print(line)
+
+            if 'hallo ' in message or 'moin ' in message or 'hi ' in message or 'huhu ' in message:
+                '''
+                aktuellviewer = viewer()
+                newlistviewer =[]
+                for name in aktuellviewer:
+                    namex = str(name).lower()
+                    newlistviewer.append(namex)
+                print(newlistviewer)
+                if newlistviewer in message:
+                    for name in newlistviewer:
+                        print(name)
+                        if name in message:
+                            user = namex
+                            break
+                    send_message("Hallo " + user + ' wie gehts dir?')
+                else:
+                    send_message("Hallo " + username + ' wie gehts dir?')
+                '''
                 send_message("Hallo " + username + ' wie gehts dir?')
-            '''
-            send_message("Hallo " + username + ' wie gehts dir?')
 
-        if 'minecraft' in message:
-            send_message('Ssssssssir ' + username + ' Wassss geht? =^.^=')
+            if 'minecraft' in message:
+                send_message('Ssssssssir ' + username + ' Wassss geht? =^.^=')
 
-        if '17 ' in message:
-            send_message('was 17? 17 Apfel?')
+            if '17 ' in message:
+                send_message('was 17? 17 Apfel?')
 
-        if 'meister ' in message and 'kleinerfuchsbot' in message:
-            send_message("Mein Meister ist ReinekeWF!")
+            if 'meister ' in message and 'kleinerfuchsbot' in message:
+                send_message("Mein Meister ist ReinekeWF!")
 
-        if 'gut und dir ' in message:
-            send_message('gut und dir?')
+            if 'gut und dir ' in message:
+                send_message('gut und dir?')
 
-        if 'schei\\xc3\\x9fe ' in message:
-            send_message('naanana das sagt man nicht!')
+            if 'schei\\xc3\\x9fe ' in message:
+                send_message('naanana das sagt man nicht!')
 
-        if 'python ' in message:
-            send_message('was ist Python? Laufe ich etwar auf Python? ... Könnte gut sein =^.^=')
+            if 'python ' in message:
+                send_message('was ist Python? Laufe ich etwar auf Python? ... Könnte gut sein =^.^=')
 
-        if 'nicht antworten ' in message:
-            send_message('nicht antworten finde ich unhöflich!')
+            if 'nicht antworten ' in message:
+                send_message('nicht antworten finde ich unhöflich!')
 
-        if 'edge ' in message:
-            send_message('Livin On The Edge by Aerosmith 🤪 ')
-        # hier sind die Commands zuhause
-        if '!commands ' in message:
-            command = ' | '.join(listCommands)
-            send_message(command)
-        if '!loben ' in message:
-            send_message('/me Fuchsi fühlt sich gelobt! =^.^=')
-        if '!geschenk ' in message:
-            beschenkter = message.split(' ')[1]
-            send_message(username + ' schenkt ' + geschenk() + ' an ' + beschenkter)
-        if message == '!git':
-            send_message('https://github.com/ReinekeWF/FoxyTwitchBot')
+            if 'edge ' in message:
+                send_message('Livin On The Edge by Aerosmith 🤪 ')
+            # hier sind die Commands zuhause
+            if '!commands ' in message:
+                command = ' | '.join(listCommands)
+                send_message(command)
+            if '!loben ' in message:
+                send_message('/me Fuchsi fühlt sich gelobt! =^.^=')
+            if '!geschenk ' in message:
+                beschenkter = message.split(' ')[1]
+                send_message(username + ' schenkt ' + geschenk() + ' an ' + beschenkter)
+            if message == '!git':
+                send_message('https://github.com/ReinekeWF/FoxyTwitchBot')
 
-        # Hier sind die hidden Commands zuhause
-        if '!sendepause ' in message:
-            zeit = (int(message.split()[1]) + round(time.time()))
-            s.send(bytes(
-                "PRIVMSG #" + CHANNEL + " :" + 'Ok Fuchsi ist still für ' + message.split()[1] + 'sekunden' + "\r\n",
-                "UTF-8"))
+            # Hier sind die hidden Commands zuhause
+            if '!sendepause ' in message:
+                zeit = (int(message.split()[1]) + round(time.time()))
+                s.send(bytes(
+                    "PRIVMSG #" + CHANNEL + " :" + 'Ok Fuchsi ist still für ' + message.split()[1] + 'sekunden' + "\r\n",
+                    "UTF-8"))
 
-        if message == '!exit':
-            send_message('Tschüss')
-            s.shutdown(1)
-            exit()
+            if message == '!exit':
+                send_message('Tschüss')
+                s.shutdown(1)
+                exit()
