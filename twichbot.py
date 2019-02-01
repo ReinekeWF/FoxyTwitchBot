@@ -4,7 +4,6 @@ import requests
 import config
 import random
 
-
 # import pygame
 # import tkinter
 
@@ -14,18 +13,20 @@ message = ''
 chat = ''
 zeit = 0
 username = 'Twich'
+meta = ''
 
 HOST = config.host
 PORT = config.port
 NICK = config.nick
 PASS = config.oauth
 
+
 def login():
     channelZaler = 0
     stellen = 5
     for Channel in config.ChannelList:
         if channelZaler == 10:
-            stellen -=1
+            stellen -= 1
         print(str(channelZaler) + ' ' * (stellen) + Channel)
         channelZaler += 1
     auswahl = input('Channel name eingeben: ')
@@ -33,8 +34,6 @@ def login():
         CHANNEL = config.ChannelList[int(auswahl)]
     except:
         CHANNEL = auswahl
-
-
 
     try:
         s.connect((HOST, PORT))
@@ -50,13 +49,13 @@ def login():
 
 def geschenk():
     geschenke = config.geschenke
-    auswahl = random.randrange(0,len(geschenke) - 1)
+    auswahl = random.randrange(0, len(geschenke) - 1)
     return geschenke[auswahl]
 
 
 def viewer():
     r = requests.get('http://tmi.twitch.tv/group/user/' + CHANNEL + '/chatters')
-    #r.encoding
+    # r.encoding
     test = r.json()
     banned = {'bots': config.bots}
 
@@ -124,7 +123,7 @@ startTime = time.time()
 
 
 CHANNEL = login()
-#send_message('Hallo der Bottige Fuchsi ist nun Online =^.^= ')
+# send_message('Hallo der Bottige Fuchsi ist nun Online =^.^= ')
 time.sleep(0.05)
 s.send(bytes("CAP REQ :twitch.tv/membership" + "\r\n", "UTF-8"))
 time.sleep(0.05)
@@ -143,20 +142,23 @@ while True:
     except:
         reconnect()
 
-    for line in chat:  # str(s.recv(1024)).split('\\r\\n'):
-        parts = line.split(':')
+    for line in chat:
+        parts = line.split('PRIVMSG #' + CHANNEL + ' :')
         if 'PING' in line:
             s.send(bytes("PONG :tmi.twitch.tv  \r\n", "UTF-8"))
             print('PONG')
 
-        if len(parts) < 3:
-            continue
+        if len(parts) >= 2:
+            meta = parts[0]
+            message = parts[1].lower()
+            print(parts[1])
+        else:
+            print(parts)
 
-        if "QUIT" not in parts[1] and "JOIN" not in parts[1] and "PART" not in parts[1]:
-            message = parts[2][:len(parts[2])].lower()
+        # if "QUIT" not in parts[0] and "JOIN" not in parts[0] and "PART" not in parts[0]:
 
         zaeler = 0
-        for object in parts[0].split(';'):
+        for object in meta.split(';'):
             if 'display-name' in object:
                 username = object.split('=')[1]
             zaeler += 1
@@ -182,7 +184,6 @@ while True:
                 send_message("Hallo " + username + ' wie gehts dir?')
             '''
             send_message("Hallo " + username + ' wie gehts dir?')
-
 
         if 'minecraft' in message:
             send_message('Ssssssssir ' + username + ' Wassss geht? =^.^=')
@@ -222,7 +223,9 @@ while True:
         # Hier sind die hidden Commands zuhause
         if '!sendepause ' in message:
             zeit = (int(message.split()[1]) + round(time.time()))
-            s.send(bytes("PRIVMSG #" + CHANNEL + " :" + 'Ok Fuchsi ist still für ' + message.split()[1] + 'sekunden' + "\r\n", "UTF-8"))
+            s.send(bytes(
+                "PRIVMSG #" + CHANNEL + " :" + 'Ok Fuchsi ist still für ' + message.split()[1] + 'sekunden' + "\r\n",
+                "UTF-8"))
 
         if message == '!exit':
             send_message('Tschüss')
