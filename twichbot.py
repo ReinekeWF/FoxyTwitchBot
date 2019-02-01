@@ -9,7 +9,7 @@ import random
 # import tkinter
 
 
-listCommands = ['!loben', '!commands', '!geschenk <zu beschenknder user>']
+listCommands = ['!loben', '!commands', '!geschenk <zu beschenknder user>', '!git']
 message = ''
 chat = ''
 zeit = 0
@@ -75,6 +75,7 @@ def viewer():
             listMods.remove(i)
         if i in listVips:
             listVips.remove(i)
+
     zahler = 0
     for viewer in listViewer:
         # text = pygame.font.Font.render(font,viewer,True,(200,200,200))
@@ -83,6 +84,7 @@ def viewer():
         print(viewer)
     # pygame.display.flip()
     # print('es sind ' + str(len(listViewer)) + ' Viewer im Chat')
+
     return listViewer
 
 
@@ -143,7 +145,6 @@ while True:
 
     for line in chat:  # str(s.recv(1024)).split('\\r\\n'):
         parts = line.split(':')
-        # print(line)
         if 'PING' in line:
             s.send(bytes("PONG :tmi.twitch.tv  \r\n", "UTF-8"))
             print('PONG')
@@ -163,7 +164,25 @@ while True:
         print(time.strftime('%H:%M:%S >>> ') + username + ": " + message)
 
         if 'hallo ' in message or 'moin ' in message or 'hi ' in message or 'huhu ' in message:
+            '''
+            aktuellviewer = viewer()
+            newlistviewer =[]
+            for name in aktuellviewer:
+                namex = str(name).lower()
+                newlistviewer.append(namex)
+            print(newlistviewer)
+            if newlistviewer in message:
+                for name in newlistviewer:
+                    print(name)
+                    if name in message:
+                        user = namex
+                        break
+                send_message("Hallo " + user + ' wie gehts dir?')
+            else:
+                send_message("Hallo " + username + ' wie gehts dir?')
+            '''
             send_message("Hallo " + username + ' wie gehts dir?')
+
 
         if 'minecraft' in message:
             send_message('Ssssssssir ' + username + ' Wassss geht? =^.^=')
@@ -197,6 +216,8 @@ while True:
         if '!geschenk ' in message:
             beschenkter = message.split(' ')[1]
             send_message(username + ' schenkt ' + geschenk() + ' an ' + beschenkter)
+        if message == '!git':
+            send_message('https://github.com/ReinekeWF/FoxyTwitchBot')
 
         # Hier sind die hidden Commands zuhause
         if '!sendepause ' in message:
