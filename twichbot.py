@@ -166,8 +166,6 @@ while True:
 
             if not message == '' and message != "'":
                 print(time.strftime('%H:%M:%S >>> ') + username + ": " + message)
-                message
-                #a = 0
             else:
                 print(line)
 
