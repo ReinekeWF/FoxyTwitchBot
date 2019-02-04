@@ -15,6 +15,7 @@ zeit = 0
 username = 'Twich'
 meta = ''
 oldchat = ''
+cooldown = 0
 
 HOST = config.host
 PORT = config.port
@@ -101,12 +102,19 @@ def reconnect():
 
 
 def send_message(message):
+
     if zeit > time.time():
         print('Fuchsi mus still bleiben')
     else:
         try:
-            s.send(bytes("PRIVMSG #" + CHANNEL + " :" + message + "\r\n", "UTF-8"))
-            print(NICK + ': ' + message)
+            if config.cooldown <= time.time() and config.lastmessage != message:
+                s.send(bytes("PRIVMSG #" + CHANNEL + " :" + message + "\r\n", "UTF-8"))
+                print(NICK + ': ' + message)
+                config.cooldown = time.time() + 2
+                config.lastmessage = message
+                print(config.cooldown)
+            else:
+                print(message)
         except:
             reconnect()
 
@@ -138,13 +146,14 @@ while True:
     #    #send_message('TimerTest')
     #    startTimet = time.time()
 
+    time.sleep(0.5)
     try:
         chat = str(s.recv(1024)).split('\\r\\n')
     except:
         reconnect()
     if chat != oldchat:
         oldchat = chat
-        for line in chat:
+        for line in oldchat:
             if "PRIVMSG #" in line:
                 parts = line.split('PRIVMSG #' + CHANNEL + ' :')
                 if len(parts) >= 2:
@@ -156,6 +165,10 @@ while True:
                         if 'display-name' in object:
                             username = object.split('=')[1]
                         zaeler += 1
+            if "JOIN" in line or "PART" in line or "QUIT" in line or "NOTICE" in line:
+                if "NOTICE" in line and "too quickly" in line:
+                    cooldown = time.time() + 30
+                print(line)
 
             if 'PING' in line:
                 s.send(bytes("PONG :tmi.twitch.tv  \r\n", "UTF-8"))
@@ -164,7 +177,9 @@ while True:
             #if "QUIT" not in parts[0] and "JOIN" not in parts[0] and "PART" not in parts[0]:
 
 
-            if not line == "'" or not 'PING' in line:
+            if line == "'" or 'PING' in line:
+                a = 0
+            elif ':tmi.twitch.tv' in line:
                 print(line)
             else:
                 print(time.strftime('%H:%M:%S >>> ') + username + ": " + message)
@@ -216,13 +231,15 @@ while True:
             if '!commands ' in message:
                 command = ' | '.join(listCommands)
                 send_message(command)
-            if '!loben ' in message:
+            if '!loben' in message:
                 send_message('/me Fuchsi fühlt sich gelobt! =^.^=')
             if '!geschenk ' in message:
                 beschenkter = message.split(' ')[1]
                 send_message(username + ' schenkt ' + geschenk() + ' an ' + beschenkter)
             if message == '!git':
                 send_message('https://github.com/ReinekeWF/FoxyTwitchBot')
+            if "!hype" in message:
+                send_message("🚂🚃🚃🚃🚃🚃🚃HYPETRAIHN incomming")
 
             # Hier sind die hidden Commands zuhause
             if '!sendepause ' in message:
@@ -232,6 +249,7 @@ while True:
                     "UTF-8"))
 
             if message == '!exit':
+                config.cooldown = 0
                 send_message('Tschüss')
                 s.shutdown(1)
                 exit()
