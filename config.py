@@ -22,7 +22,7 @@ ChannelList = ['artimus83',
 # Twitchbots
 bots = ['freast',
         'nightbot',
-        '',
+        'stay_hydrated_bot',
         'commanderroot',
         'apricotdrupefruit',
         'electricallongboard',
@@ -36,3 +36,14 @@ bots = ['freast',
         'energyzbot',
         'kleinerfuchsbot'
         ]
+
+geschenke = ['eine Rose',
+             'ein Gals voll Deack',
+             'einen Mob',
+             'einene hustenden Aschenbecher',
+             '30 Kronkorken'
+
+
+            ]
+cooldown = 0
+lastmessage = ""
