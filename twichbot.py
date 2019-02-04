@@ -112,7 +112,7 @@ def send_message(message):
                 print(NICK + ': ' + message)
                 config.cooldown = time.time() + 2
                 config.lastmessage = message
-                print(config.cooldown)
+                #print(config.cooldown)
             else:
                 print(message)
         except:
@@ -140,6 +140,7 @@ s.send(bytes("CAP REQ :twitch.tv/tags" + "\r\n", "UTF-8"))
 time.sleep(0.05)
 s.send(bytes("CAP REQ :twitch.tv/commands" + "\r\n", "UTF-8"))
 viewer()
+send_message("/color SpringGreen")
 while True:
     # if (time.time() - startTime) >= 60 * 5:
     #    viewer()
@@ -169,6 +170,9 @@ while True:
                 if "NOTICE" in line and "too quickly" in line:
                     cooldown = time.time() + 30
                 print(line)
+                #if 'JOIN' in line:
+                #    print(line)
+                continue
 
             if 'PING' in line:
                 s.send(bytes("PONG :tmi.twitch.tv  \r\n", "UTF-8"))
@@ -179,10 +183,12 @@ while True:
 
             if line == "'" or 'PING' in line:
                 a = 0
-            elif ':tmi.twitch.tv' in line:
-                print(line)
+            elif ':tmi.twitch.tv ' in line or config.nick in line:
+                print(time.strftime('%H:%M:%S >>> ') + username + ": " + line)
+                continue
             else:
                 print(time.strftime('%H:%M:%S >>> ') + username + ": " + message)
+                continue
 
             if 'hallo ' in message or 'moin ' in message or 'hi ' in message or 'huhu ' in message:
                 '''
@@ -253,3 +259,5 @@ while True:
                 send_message('Tschüss')
                 s.shutdown(1)
                 exit()
+    else:
+        a = 0
