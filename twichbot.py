@@ -15,7 +15,7 @@ zeit = 0
 username = 'Twich'
 meta = ''
 oldchat = ''
-cooldown = 0
+
 
 HOST = config.host
 PORT = config.port
