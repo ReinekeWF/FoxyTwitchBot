@@ -16,7 +16,6 @@ username = 'Twich'
 meta = ''
 oldchat = ''
 
-
 HOST = config.host
 PORT = config.port
 NICK = config.nick
@@ -139,7 +138,7 @@ time.sleep(0.05)
 s.send(bytes("CAP REQ :twitch.tv/tags" + "\r\n", "UTF-8"))
 time.sleep(0.05)
 s.send(bytes("CAP REQ :twitch.tv/commands" + "\r\n", "UTF-8"))
-viewer()
+aktivuser = viewer()
 send_message("/color SpringGreen")
 while True:
     # if (time.time() - startTime) >= 60 * 5:
@@ -150,6 +149,7 @@ while True:
     time.sleep(0.5)
     try:
         chat = str(s.recv(1024)).split('\\r\\n')
+
     except:
         reconnect()
     if chat != oldchat:
@@ -166,7 +166,13 @@ while True:
                         if 'display-name' in object:
                             username = object.split('=')[1]
                         zaeler += 1
-            if "JOIN" in line or "PART" in line or "QUIT" in line or "NOTICE" in line:
+            if "JOIN" in line or "PART" in line or "QUIT" in line or "NOTICE" in line or "USERSTATE" in line:
+                if "JOIN" in line:
+                    lineuser = line.split("@")
+                    user = lineuser[1].split(".")
+                    if user not in config.bots and user not in aktivuser:
+                        send_message("Willkommen " + user[0])
+                        aktivuser.append(user[0])
                 if "NOTICE" in line and "too quickly" in line:
                     cooldown = time.time() + 30
                 print(line)
@@ -208,7 +214,7 @@ while True:
                 else:
                     send_message("Hallo " + username + ' wie gehts dir?')
                 '''
-                send_message("Hallo " + username + ' wie gehts dir?')
+                send_message("Hallo " + username + ' =^.^=')
 
             if 'minecraft' in message:
                 send_message('Ssssssssir ' + username + ' Wassss geht? =^.^=')
@@ -233,6 +239,8 @@ while True:
 
             if 'edge ' in message:
                 send_message('Livin On The Edge by Aerosmith 🤪 ')
+            if 'http' in message:
+                send_message('fuchsi mag Link nur als Feralform')
             # hier sind die Commands zuhause
             if '!commands ' in message:
                 command = ' | '.join(listCommands)
