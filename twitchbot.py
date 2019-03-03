@@ -1,3 +1,4 @@
+# -*- coding: UTF-8 -*-
 import time
 import socket
 import requests
@@ -21,6 +22,7 @@ PORT = config.port
 NICK = config.nick
 PASS = config.oauth
 
+log = open("log.txt","a")
 
 def login():
     channelZaler = 0
@@ -171,7 +173,7 @@ while True:
                     lineuser = line.split("@")
                     user = lineuser[1].split(".")
                     if user not in config.bots and user not in aktivuser:
-                        send_message("Willkommen " + user[0])
+                        #send_message("Willkommen " + user[0])
                         aktivuser.append(user[0])
                 if "NOTICE" in line and "too quickly" in line:
                     cooldown = time.time() + 30
