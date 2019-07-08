@@ -5,6 +5,8 @@ import requests
 import config
 import random
 
+# import threading
+
 # import pygame
 # import tkinter
 
@@ -24,7 +26,13 @@ PASS = config.oauth
 
 log = open("log.txt","a")
 
+timer = 0
+timerold = -1
+
 def login():
+    """login"""
+
+
     channelZaler = 0
     stellen = 5
     for Channel in config.ChannelList:
@@ -51,12 +59,15 @@ def login():
 
 
 def geschenk():
+    """zufÃƒÂ¤lliges geschenk auswÃƒÂ¤hlen"""
+
     geschenke = config.geschenke
     auswahl = random.randrange(0, len(geschenke) - 1)
     return geschenke[auswahl]
 
 
 def viewer():
+    """listet alle zuschauer auf"""
     r = requests.get('http://tmi.twitch.tv/group/user/' + CHANNEL + '/chatters')
     # r.encoding
     test = r.json()
@@ -91,6 +102,7 @@ def viewer():
 
 
 def reconnect():
+    """reconnect"""
     s.close()
     s.connect((HOST, PORT))
     time.sleep(0.05)
@@ -104,6 +116,10 @@ def reconnect():
 
 def send_message(message):
 
+    """
+    Args:
+        message:
+    """
     if zeit > time.time():
         print('Fuchsi mus still bleiben')
     else:
@@ -119,36 +135,10 @@ def send_message(message):
         except:
             reconnect()
 
-
-# pygame.init()
-# pygame.font.init()
-# font = pygame.font.Font('C:/Windows/Fonts/verdana.ttf',18)
-# fenster = pygame.display.set_mode((400,800))
-
-s = socket.socket()
-
-startTime = time.time()
-# viewerlist = []
-# viewerlist.append(viewer())
-
-
-CHANNEL = login()
-# send_message('Hallo der Bottige Fuchsi ist nun Online =^.^= ')
-time.sleep(0.05)
-s.send(bytes("CAP REQ :twitch.tv/membership" + "\r\n", "UTF-8"))
-time.sleep(0.05)
-s.send(bytes("CAP REQ :twitch.tv/tags" + "\r\n", "UTF-8"))
-time.sleep(0.05)
-s.send(bytes("CAP REQ :twitch.tv/commands" + "\r\n", "UTF-8"))
-aktivuser = viewer()
-send_message("/color SpringGreen")
-while True:
-    # if (time.time() - startTime) >= 60 * 5:
-    #    viewer()
-    #    #send_message('TimerTest')
-    #    startTimet = time.time()
-
-    time.sleep(0.5)
+'''
+def get_message ():
+    """Holt sich die Nachrichten"""
+    chat = ''
     try:
         chat = str(s.recv(1024)).split('\\r\\n')
 
@@ -157,6 +147,7 @@ while True:
     if chat != oldchat:
         oldchat = chat
         for line in oldchat:
+            #log.write(line + "\n")
             if "PRIVMSG #" in line:
                 parts = line.split('PRIVMSG #' + CHANNEL + ' :')
                 if len(parts) >= 2:
@@ -190,6 +181,123 @@ while True:
 
 
             if line == "'" or 'PING' in line:
+                continue
+            elif ':tmi.twitch.tv ' in line or config.nick in line:
+                print(time.strftime('%H:%M:%S >>> ') + username + ": " + line)
+                continue
+            else:
+                print(time.strftime('%H:%M:%S >>> ') + username + ": " + message)
+                continue
+    return username, message
+
+def kampffuchs():
+    while True:
+        time.sleep(2)
+        print("test")
+        if config.kampfModus == -1:
+            config.startkampf = time.time()
+            config.kampfModus = 1
+            send_message("!fight")
+            print("fight start" + str(config.timerold))
+        if config.kampfModus == 1 and (time.time() - config.startkampf) >= 120:
+            config.kampfModus = 0
+            config.timerold = time.time()
+            print("fight end" + str(timerold))
+        if config.kampfModus == 1 and (time.time() - config.startkampf) < 120:
+            if (config.timerold - time.time()) >= 10 or config.timerold == -1:
+                config.timerold = time.time()
+                time.sleep(0.5)
+                send_message("!" + str(random.randrange(1,5)))
+                print("fight state" + str(timerold))
+            else:
+                print("fight nothing" + str(timerold))
+'''
+# pygame.init()
+# pygame.font.init()
+# font = pygame.font.Font('C:/Windows/Fonts/verdana.ttf',18)
+# fenster = pygame.display.set_mode((400,800))
+
+s = socket.socket()
+
+startTime = time.time()
+# viewerlist = []
+# viewerlist.append(viewer())
+
+
+CHANNEL = login()
+# send_message('Hallo der Bottige Fuchsi ist nun Online =^.^= ')
+time.sleep(0.05)
+s.send(bytes("CAP REQ :twitch.tv/membership" + "\r\n", "UTF-8"))
+time.sleep(0.05)
+s.send(bytes("CAP REQ :twitch.tv/tags" + "\r\n", "UTF-8"))
+time.sleep(0.05)
+s.send(bytes("CAP REQ :twitch.tv/commands" + "\r\n", "UTF-8"))
+aktivuser = viewer()
+send_message("/color SpringGreen")
+
+#kampf = threading.Thread(target=kampffuchs())
+while True:
+    # if (time.time() - startTime) >= 60 * 5:
+    #    viewer()
+    #    #send_message('TimerTest')
+    #    startTimet = time.time()
+
+    time.sleep(1)
+    ###################################
+    try:
+        chat = str(s.recv(1024)).split('\\r\\n')
+    except:
+        reconnect()
+
+    if chat != oldchat:
+        oldchat = chat
+        for line in oldchat:
+            log.write(line + "\n")
+            bots = False
+            for bot in config.bots:
+                if bot in line:
+                    bots = True
+                    continue
+            if "PRIVMSG #" in line and not bots:
+                parts = line.split('PRIVMSG #' + CHANNEL + ' :')
+                if len(parts) >= 2:
+                    meta = parts[0]
+                    message = parts[1].lower()
+                    #print(parts[1])
+                    zaeler = 0
+                    for object in meta.split(';'):
+                        if 'display-name' in object:
+                            username = object.split('=')[1]
+                        zaeler += 1
+            if "JOIN" in line or "PART" in line or "QUIT" in line or "NOTICE" in line or "USERSTATE" in line:
+                if "JOIN" in line:
+                    lineuser = line.split("@")
+                    user = lineuser[1].split(".")
+                    if user not in config.bots: # or user not in aktivuser:
+                        print("JOIN: " + user[0])
+                        #send_message("Willkommen " + user[0])
+                        aktivuser.append(user[0])
+                if "NOTICE" in line and "too quickly" in line:
+                    cooldown = time.time() + 30
+                if "PART" in line:
+                    lineuser = line.split("@")
+                    user = lineuser[1].split(".")
+                    if user not in config.bots: # not user not in aktivuser:
+                        print("GO OUT: " + user[0])
+
+                #print(line)
+                #if 'JOIN' in line:
+                #    print(line)
+                continue
+
+            if 'PING' in line:
+                s.send(bytes("PONG :tmi.twitch.tv  \r\n", "UTF-8"))
+                print('PONG')
+
+            #if "QUIT" not in parts[0] and "JOIN" not in parts[0] and "PART" not in parts[0]:
+
+
+            if line == "'" or 'PING' in line:
                 a = 0
             elif ':tmi.twitch.tv ' in line or config.nick in line:
                 print(time.strftime('%H:%M:%S >>> ') + username + ": " + line)
@@ -197,7 +305,7 @@ while True:
             else:
                 print(time.strftime('%H:%M:%S >>> ') + username + ": " + message)
                 continue
-
+############################################################
             if 'hallo ' in message or 'moin ' in message or 'hi ' in message or 'huhu ' in message:
                 '''
                 aktuellviewer = viewer()
@@ -219,7 +327,7 @@ while True:
                 send_message("Hallo " + username + ' =^.^=')
 
             if 'minecraft' in message:
-                send_message('Ssssssssir ' + username + ' Wassss geht? =^.^=')
+                send_message('Ssssssssir ' + username + ' Wassss geht? BOOOM =^.^=')
 
             if '17 ' in message:
                 send_message('was 17? 17 Apfel?')
@@ -240,7 +348,7 @@ while True:
                 send_message('nicht antworten finde ich unhöflich!')
 
             if 'edge ' in message:
-                send_message('Livin On The Edge by Aerosmith 🤪 ')
+                send_message('Livin On The Edge by Aerosmith ')
             if 'http' in message:
                 send_message('fuchsi mag Link nur als Feralform')
             # hier sind die Commands zuhause
@@ -251,11 +359,15 @@ while True:
                 send_message('/me Fuchsi fühlt sich gelobt! =^.^=')
             if '!geschenk ' in message:
                 beschenkter = message.split(' ')[1]
-                send_message(username + ' schenkt ' + geschenk() + ' an ' + beschenkter)
+                send_message("@" + username + ' schenkt ' + geschenk() + ' an @' + beschenkter)
             if message == '!git':
                 send_message('https://github.com/ReinekeWF/FoxyTwitchBot')
             if "!hype" in message:
-                send_message("🚂🚃🚃🚃🚃🚃🚃HYPETRAIHN incomming")
+                send_message("HYPETRAIHN incomming")
+
+            if "!fight" in message and username == "ReinekeWF":
+                config.timerold = -1
+                config.kampfModus = -1
 
             # Hier sind die hidden Commands zuhause
             if '!sendepause ' in message:
@@ -267,6 +379,7 @@ while True:
             if message == '!exit':
                 config.cooldown = 0
                 send_message('Tschüss')
+                log.close()
                 s.shutdown(1)
                 exit()
     else:
