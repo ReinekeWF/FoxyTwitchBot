@@ -2,7 +2,7 @@
 host = 'irc.chat.twitch.tv'
 port = 6667
 nick = 'kleinerfuchsbot'
-oauth = 'oauth:xxxxxxxxxxxxxxx'
+oauth = 'oauth:ry3j3g9bjqeuha80vthdseidwl7ory'
 
 # Favorisirte Channel
 ChannelList = ['artimus83',
@@ -34,7 +34,11 @@ bots = ['freast',
         'activeenergy',
         'moobot',
         'energyzbot',
-        'kleinerfuchsbot'
+        'kleinerfuchsbot',
+        's1faka',
+        'n1cthegamer',
+        'vierneunundneunzig'
+
         ]
 
 geschenke = ['eine Rose',
@@ -45,5 +49,14 @@ geschenke = ['eine Rose',
 
 
             ]
+
+zufälligeNachrichten = [
+    'Fuchsi ist Langweilig -.-',
+    'ist keiner mehr da?',
+    'Fuchsi ist traurig alle schweigen -.-',
+]
 cooldown = 0
 lastmessage = ""
+timerold = 0
+kampfModus = 0
+startkampf = 0

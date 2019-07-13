@@ -1,6 +1,8 @@
 
 import config
 import socket
+import  twitchio
+
 import time
 s = socket.socket()
 

@@ -18,6 +18,7 @@ zeit = 0
 username = 'Twich'
 meta = ''
 oldchat = ''
+lastMessageTime = time.time()
 
 HOST = config.host
 PORT = config.port
@@ -65,6 +66,9 @@ def geschenk():
     auswahl = random.randrange(0, len(geschenke) - 1)
     return geschenke[auswahl]
 
+def randomevent():
+    auswahl = config.zufälligeNachrichten[random.randint(0,len(config.zufälligeNachrichten)-1)]
+    return auswahl
 
 def viewer():
     """listet alle zuschauer auf"""
@@ -265,6 +269,7 @@ while True:
                     message = parts[1].lower()
                     #print(parts[1])
                     zaeler = 0
+                    lastMessageTime = time.time()
                     for object in meta.split(';'):
                         if 'display-name' in object:
                             username = object.split('=')[1]
@@ -326,6 +331,12 @@ while True:
                 '''
                 send_message("Hallo " + username + ' =^.^=')
 
+            if (time.time() - lastMessageTime) >= (60*5):
+                lastMessageTime = time.time()
+                send_message(randomevent())
+
+                print("langweilig")
+
             if 'minecraft' in message:
                 send_message('Ssssssssir ' + username + ' Wassss geht? BOOOM =^.^=')
 
@@ -350,7 +361,7 @@ while True:
             if 'edge ' in message:
                 send_message('Livin On The Edge by Aerosmith ')
             if 'http' in message:
-                send_message('fuchsi mag Link nur als Feralform')
+                send_message('Fuchsi mag Links Wolfform')
             # hier sind die Commands zuhause
             if '!commands ' in message:
                 command = ' | '.join(listCommands)
