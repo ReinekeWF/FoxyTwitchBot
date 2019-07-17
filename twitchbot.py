@@ -357,39 +357,39 @@ while True:
 
 
             # hier sind die Commands zuhause
-            if '!meister' in message:
+            elif '!meister' in message:
                 send_message("Mein Meister ist ReinekeWF!")
 
-            if '!commands' in message:
+            elif '!commands' in message:
                 command = ' | '.join(config.listCommands)
                 send_message(command)
 
-            if '!loben' in message:
+            elif '!loben' in message:
                 send_message('/me Fuchsi fühlt sich gelobt! =^.^=')
 
-            if '!geschenk ' in message:
+            elif '!geschenk ' in message:
                 beschenkter = message.split(' ')[1]
                 send_message("@" + username + ' schenkt ' + geschenk() + ' an @' + beschenkter)
 
-            if message == '!git':
+            elif message == '!git':
                 send_message('https://github.com/ReinekeWF/FoxyTwitchBot')
 
-            if "!hype" in message:
+            elif "!hype" in message:
                 send_message("HYPETRAIHN incomming")
 
-            if "!fight" in message and username == "ReinekeWF":
+            elif "!fight" in message and username == "ReinekeWF":
                 config.timerold = -1
                 config.kampfModus = -1
 
 
             # Hier sind die hidden Commands zuhause
-            if '!sendepause ' in message:
+            elif '!sendepause ' in message:
                 zeit = (int(message.split()[1]) + round(time.time()))
                 s.send(bytes(
                     "PRIVMSG #" + CHANNEL + " :" + 'Ok Fuchsi ist still für ' + message.split()[1] + 'sekunden' + "\r\n",
                     "UTF-8"))
 
-            if message == '!exit':
+            elif message == '!exit':
                 config.cooldown = 0
                 send_message('Tschüss')
                 log.close()
