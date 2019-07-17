@@ -10,8 +10,6 @@ import random
 # import pygame
 # import tkinter
 
-
-listCommands = ['!loben', '!commands', '!geschenk <zu beschenknder user>', '!git']
 message = ''
 chat = ''
 zeit = 0
@@ -274,7 +272,7 @@ while True:
                         if 'display-name' in object:
                             username = object.split('=')[1]
                         zaeler += 1
-            if "JOIN" in line or "PART" in line or "QUIT" in line or "NOTICE" in line or "USERSTATE" in line:
+            elif "JOIN" in line or "PART" in line or "QUIT" in line or "NOTICE" in line or "USERSTATE" in line:
                 if "JOIN" in line:
                     lineuser = line.split("@")
                     user = lineuser[1].split(".")
@@ -282,9 +280,9 @@ while True:
                         print("JOIN: " + user[0])
                         #send_message("Willkommen " + user[0])
                         aktivuser.append(user[0])
-                if "NOTICE" in line and "too quickly" in line:
+                elif "NOTICE" in line and "too quickly" in line:
                     cooldown = time.time() + 30
-                if "PART" in line:
+                elif "PART" in line:
                     lineuser = line.split("@")
                     user = lineuser[1].split(".")
                     if user not in config.bots: # not user not in aktivuser:
@@ -295,7 +293,7 @@ while True:
                 #    print(line)
                 continue
 
-            if 'PING' in line:
+            elif 'PING' in line:
                 s.send(bytes("PONG :tmi.twitch.tv  \r\n", "UTF-8"))
                 print('PONG')
 
@@ -310,7 +308,33 @@ while True:
             else:
                 print(time.strftime('%H:%M:%S >>> ') + username + ": " + message)
                 continue
-############################################################
+
+
+
+
+
+            # Random Nachricht falls nichts im chat passiert
+            if (time.time() - lastMessageTime) >= (60*5):
+                lastMessageTime = time.time()
+                send_message(randomevent())
+
+                print("langweilig")
+
+
+            # Normale KeyWords ohne Benutzer interaktion
+            for KeyWord in config.KeyWords:
+                if KeyWord in message:
+                    if not len(config.KeyWords.get(KeyWord)) > 10:
+                        auswahlNummer = random.randint(0,len(config.KeyWords.get(KeyWord))-1)
+                        auswahlNachrichten = config.KeyWords.get(KeyWord)
+                        send_message(auswahlNachrichten[auswahlNummer])
+                        continue
+                    else:
+                        send_message(config.KeyWords.get(KeyWord))
+                        continue
+
+
+            # Castom Keyworts mit Benutzer  interaktion
             if 'hallo ' in message or 'moin ' in message or 'hi ' in message or 'huhu ' in message:
                 '''
                 aktuellviewer = viewer()
@@ -331,54 +355,32 @@ while True:
                 '''
                 send_message("Hallo " + username + ' =^.^=')
 
-            if (time.time() - lastMessageTime) >= (60*5):
-                lastMessageTime = time.time()
-                send_message(randomevent())
 
-                print("langweilig")
-
-            if 'minecraft' in message:
-                send_message('Ssssssssir ' + username + ' Wassss geht? BOOOM =^.^=')
-
-            if '17 ' in message:
-                send_message('was 17? 17 Apfel?')
-
-            if 'meister ' in message and 'kleinerfuchsbot' in message:
+            # hier sind die Commands zuhause
+            if '!meister' in message:
                 send_message("Mein Meister ist ReinekeWF!")
 
-            if 'gut und dir ' in message:
-                send_message('gut und dir?')
-
-            if 'schei\\xc3\\x9fe ' in message:
-                send_message('naanana das sagt man nicht!')
-
-            if 'python ' in message:
-                send_message('was ist Python? Laufe ich etwar auf Python? ... Könnte gut sein =^.^=')
-
-            if 'nicht antworten ' in message:
-                send_message('nicht antworten finde ich unhöflich!')
-
-            if 'edge ' in message:
-                send_message('Livin On The Edge by Aerosmith ')
-            if 'http' in message:
-                send_message('Fuchsi mag Links Wolfform')
-            # hier sind die Commands zuhause
-            if '!commands ' in message:
-                command = ' | '.join(listCommands)
+            if '!commands' in message:
+                command = ' | '.join(config.listCommands)
                 send_message(command)
+
             if '!loben' in message:
                 send_message('/me Fuchsi fühlt sich gelobt! =^.^=')
+
             if '!geschenk ' in message:
                 beschenkter = message.split(' ')[1]
                 send_message("@" + username + ' schenkt ' + geschenk() + ' an @' + beschenkter)
+
             if message == '!git':
                 send_message('https://github.com/ReinekeWF/FoxyTwitchBot')
+
             if "!hype" in message:
                 send_message("HYPETRAIHN incomming")
 
             if "!fight" in message and username == "ReinekeWF":
                 config.timerold = -1
                 config.kampfModus = -1
+
 
             # Hier sind die hidden Commands zuhause
             if '!sendepause ' in message:
@@ -393,5 +395,6 @@ while True:
                 log.close()
                 s.shutdown(1)
                 exit()
+
     else:
         a = 0
