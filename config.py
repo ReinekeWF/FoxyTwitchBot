@@ -2,7 +2,7 @@
 host = 'irc.chat.twitch.tv'
 port = 6667
 nick = 'kleinerfuchsbot'
-oauth = 'oauth:'
+oauth = 'oauth:ry3j3g9bjqeuha80vthdseidwl7ory'
 
 # Favorisirte Channel
 ChannelList = ['artimus83',
@@ -17,7 +17,8 @@ ChannelList = ['artimus83',
                'vectordex',
                'lukascode',
                's0pht',
-               'phosphortv_'
+               'phosphortv_',
+               'larszauberer'
                ]
 
 # Twitchbots
@@ -66,6 +67,9 @@ zufälligeNachrichten = ['Fuchsi ist Langweilig -.-',
                         ]
 
 KeyWords = {'17 ' : 'Was 17? 17 Apfel?',
+            'alexa' : ('Alexa ist die weibliche formvon Alex','Warum fängt die immer ungefragt mit dem Satz an "ich konnte ihre frage nicht verstähen"'),
+            'satisfactory bot' : ('Nicht persönlich, seint aber ein netter zu sein.'),
+            'unreal' : ('Wie unrealistisch ist das den?','Brumm Brumm mit dem unrealen Auto'),
             'test mich' : ('Test zurück','test 2'),
             'python ' : 'Was ist Python? Laufe ich etwar auf Python? ... Könnte gut sein =^.^=',
             'schei\\xc3\\x9fe ' : ('Nanana das sagt man doch nicht!','Du Ferkel geh und wasch dir den den Mund'),
@@ -77,7 +81,8 @@ KeyWords = {'17 ' : 'Was 17? 17 Apfel?',
             'nicht antworten ' : 'Nicht drauf zu antworten ist aber unhöflich',
             'edge ' : 'Livin On The Edge by Aerosmith',
             'http:' : ('Fuchsi mag Links Wolfform','Hmmm ein Link! Oder doch lieber Selda?'),
-            'https:' : ('Was? Link in Ketten? Warum?')
+            'https:' : ('Was? Link in Ketten? Warum?'),
+            'fuchs' : 'ich mag Füchse'
             }
 
 
