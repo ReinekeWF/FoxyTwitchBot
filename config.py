@@ -2,7 +2,7 @@
 host = 'irc.chat.twitch.tv'
 port = 6667
 nick = 'kleinerfuchsbot'
-oauth = 'oauth:ry3j3g9bjqeuha80vthdseidwl7ory'
+oauth = 'oauth:ry3j3g9bjqeuha80vthdseidwl7or'
 
 # Favorisirte Channel
 ChannelList = ['artimus83',
