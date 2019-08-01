@@ -12,9 +12,8 @@ import random
 message = ''
 chat = ''
 zeit = 0
-username = 'Twitch'
 meta = ''
-oldchat = ''
+oldchat = []
 lastMessageTime = time.time()
 lastChatUserTime = time.time()
 
@@ -136,84 +135,6 @@ def send_message(message):
         except:
             reconnect()
 
-
-'''
-def get_message ():
-    """Holt sich die Nachrichten"""
-    chat = ''
-    try:
-        chat = str(s.recv(1024)).split('\\r\\n')
-
-    except:
-        reconnect()
-    if chat != oldchat:
-        oldchat = chat
-        for line in oldchat:
-            #log.write(line + "\n")
-            if "PRIVMSG #" in line:
-                parts = line.split('PRIVMSG #' + CHANNEL + ' :')
-                if len(parts) >= 2:
-                    meta = parts[0]
-                    message = parts[1].lower()
-                    #print(parts[1])
-                    zaeler = 0
-                    for object in meta.split(';'):
-                        if 'display-name' in object:
-                            username = object.split('=')[1]
-                        zaeler += 1
-            if "JOIN" in line or "PART" in line or "QUIT" in line or "NOTICE" in line or "USERSTATE" in line:
-                if "JOIN" in line:
-                    lineuser = line.split("@")
-                    user = lineuser[1].split(".")
-                    if user not in config.bots and user not in aktivuser:
-                        #send_message("Willkommen " + user[0])
-                        aktivuser.append(user[0])
-                if "NOTICE" in line and "too quickly" in line:
-                    cooldown = time.time() + 30
-                print(line)
-                #if 'JOIN' in line:
-                #    print(line)
-                continue
-
-            if 'PING' in line:
-                s.send(bytes("PONG :tmi.twitch.tv  \r\n", "UTF-8"))
-                print('PONG')
-
-            #if "QUIT" not in parts[0] and "JOIN" not in parts[0] and "PART" not in parts[0]:
-
-
-            if line == "'" or 'PING' in line:
-                continue
-            elif ':tmi.twitch.tv ' in line or config.nick in line:
-                print(time.strftime('%H:%M:%S >>> ') + username + ": " + line)
-                continue
-            else:
-                print(time.strftime('%H:%M:%S >>> ') + username + ": " + message)
-                continue
-    return username, message
-
-def kampffuchs():
-    while True:
-        time.sleep(2)
-        print("test")
-        if config.kampfModus == -1:
-            config.startkampf = time.time()
-            config.kampfModus = 1
-            send_message("!fight")
-            print("fight start" + str(config.timerold))
-        if config.kampfModus == 1 and (time.time() - config.startkampf) >= 120:
-            config.kampfModus = 0
-            config.timerold = time.time()
-            print("fight end" + str(timerold))
-        if config.kampfModus == 1 and (time.time() - config.startkampf) < 120:
-            if (config.timerold - time.time()) >= 10 or config.timerold == -1:
-                config.timerold = time.time()
-                time.sleep(0.5)
-                send_message("!" + str(random.randrange(1,5)))
-                print("fight state" + str(timerold))
-            else:
-                print("fight nothing" + str(timerold))
-'''
 # pygame.init()
 # pygame.font.init()
 # font = pygame.font.Font('C:/Windows/Fonts/verdana.ttf',18)
@@ -237,8 +158,10 @@ s.send(bytes("CAP REQ :twitch.tv/commands" + "\r\n", "UTF-8"))
 aktivuser = []  # viewer()
 send_message("/color SpringGreen")
 
-thisUser = ''
+thisUser = 'Twitch'
 chatuser = []
+newUser = dict()
+aktuser = dict()
 
 # kampf = threading.Thread(target=kampffuchs())
 while True:
@@ -251,109 +174,144 @@ while True:
     time.sleep(1)
     ###################################
     try:
-        chat = str(s.recv(1024)).split('\\r\\n')
+        chat = str(s.recv(1024).decode("utf-8")).split('\\r\\n')
     except:
         reconnect()
 
-    if chat != oldchat:
-        oldchat = chat
-        for line in oldchat:
+    # Random Nachricht falls nichts im chat passiert
+    if (time.time() - lastMessageTime) >= (60 * 10):
+        lastMessageTime = time.time()
+        send_message(randomevent())
+    #live ausgabe hilfe für user
+    if (time.time() - lastChatUserTime) >= (60):
+        lastChatUserTime = time.time()
+        print(chatuser)
+        if chatuser != []:
+            print('-' * 20)
+            for x in chatuser:
+                print(x.get('display-name'))
+            print('-' * 20)
+
+    for line in chat:
+        if line not in oldchat:
+            oldchat.append(line)
             log.write(line + "\n")
-            bots = False
-            for bot in config.bots:
-                if bot in line:
-                    bots = True
+            if "PRIVMSG #" in line:
+                bots = False
+                for bot in config.bots:
+                    if bot in line:
+                        bots = True
+                        break
+                if bots:
                     continue
-            if "PRIVMSG #" in line and not bots:
-                parts = line.split('PRIVMSG #' + CHANNEL + ' :')
-                if len(parts) >= 2:
-                    userdata = parts[0].split(';')
-                    newUser = dict()
-                    for data in userdata:
-                        dataParts = data.split('=')
-                        key = dataParts[0]
-                        valve = dataParts[1]
-                        newUser.update({str(key): valve})
+                else:
+                    parts = line.split('PRIVMSG #' + CHANNEL + ' :')
+                    if len(parts) >= 2:
+                        userdata = parts[0].split(';')
+                        message = parts[1].lower()
+                        newUser = dict()
+                        for data in userdata:
+                            dataParts = data.split('=')
+                            if len(dataParts) == 2:
+                                key = dataParts[0]
+                                valve = dataParts[1]
+                                newUser.update({str(key): valve})
+                        thisUser = newUser.get('display-name')
+                        usermode = newUser.get('badges')
+                        u = True
+                        aktuser = newUser
+                        if chatuser != []:
+                            for x in chatuser:
+                                if x.get('display-name') in newUser.get('display-name'):
+                                    u = False
+                                else:
+                                    continue
+                        if u == True:
+                            chatuser.append(newUser)
+                    lastMessageTime = time.time()
+                aktusermeta = aktuser.keys()
+                for x in aktusermeta:
+                    if x == 'badges':
+                        test = aktuser.get('badges')
+                        try:
+                            userinhalt = test.split(',')
+                        except:
+                            userinhalt = []
+                            userinhalt.append(test)
 
-                    thisUser = newUser.get('display-name')
+                        for inhalt in userinhalt:
 
-                    u = True
-                    for x in chatuser:
-                        if x.get('display-name') in newUser.get('display-name'):
-                            u = False
+                            inhaltparts = inhalt.split('/')
+                            if inhaltparts[0] == 'broadcaster':
+                                streamer = True
+                            else:
+                                streamer = False
+
+                            if inhaltparts[0] == 'subscriber':
+                                subscriber = True
+                                subscribertime = int(inhaltparts[1])
+                            else:
+                                subscriber = False
+                                subscribertime = 0
+
+                            if inhaltparts[0] == 'bits':
+                                bits = int(inhaltparts[1])
+                            else:
+                                bits = 0
+
+                    if x == 'mod':
+                        test = aktuser.get('mod')
+                        if test == '1':
+                            mod = True
                         else:
-                            continue
-                    if u == True:
-                        chatuser.append(newUser)
+                            mod = False
+                    if x == 'turbo':
+                        test = aktuser.get('turbo')
+                        if test == '1':
+                            turbo = True
+                        else:
+                            turbo = False
+                print(time.strftime('%H:%M:%S >>> ') + thisUser + ": " + line)
 
-                message = parts[1].lower()
-                # print(parts[1])
-                zaeler = 0
-                lastMessageTime = time.time()
-                for object in meta.split(';'):
-                    if 'display-name' in object:
-                        username = object.split('=')[1]
-                    zaeler += 1
-            elif "JOIN" in line or "PART" in line or "QUIT" in line or "NOTICE" in line or "USERSTATE" in line:
 
-                if "JOIN" in line:
-                    lineuser = line.split("@")
+            if "JOIN #" in line:
+                lineuser = line.split("@")
+                try:
                     user = lineuser[1].split(".")
-                    if user not in config.bots:  # or user not in aktivuser:
-                        print("JOIN: " + user[0])
+                except:
+                    continue
+                if user not in config.bots:  # or user not in aktivuser:
+                    print("JOIN: " + user[0])
 
-                        # send_message("Willkommen " + user[0])
-                        aktivuser.append(user[0])
+                    # send_message("Willkommen " + user[0])
+                    aktivuser.append(user[0])
 
-                if "NOTICE" in line and "too quickly" in line:
-                    cooldown = time.time() + 30
-                elif 'NOTICE' in line:
+            if 'USERNOTICE' in line or ':tmi.twitch.tv ' in line or 'NOTICE #' in line: # b'@badge-info=subscriber/0;badges=subscriber/0,premium/1;color=#5F9EA0;display-name=SanderPrGa;emotes=;flags=;id=e43959c5-5c08-4cfc-8514-81139cb11ccc;login=sanderprga;mod=0;msg-id=sub;msg-param-cumulative-months=1;msg-param-months=0;msg-param-should-share-streak=0;msg-param-sub-plan-name=Channel\\sSubscription\\s(gronkh);msg-param-sub-plan=Prime;room-id=12875057;subscriber=1;system-msg=SanderPrGa\\ssubscribed\\swith\\sTwitch\\sPrime.;tmi-sent-ts=1564179542211;user-id=52257072;user-type= :tmi.twitch.tv USERNOTICE #gronkh
+                print("USERNOTICE")
+                print(line)
+
+                if 'NOTICE #' in line:
+                    if "too quickly" in line:
+                        cooldown = time.time() + 30
+                    else:
+                        print('NOTICE')
+                        print(line)
+                if 'USERSTATE #' in line:
+                    print('USERSTATE')
                     print(line)
-                elif 'USERSTATE' in line:
-                    print(line)
-                elif "PART" in line:
-                    lineuser = line.split("@")
-                    user = lineuser[1].split(".")
-                    if user in aktivuser:
-                        aktivuser.remove(user)
-                    if user not in config.bots:  # not user not in aktivuser:
-                        print("GO OUT: " + user[0])
+                print(time.strftime('%H:%M:%S >>> ') + thisUser + ": " + line)
 
-                # print(line)
-                # if 'JOIN' in line:
-                #    print(line)
-                continue
+            if "PART #" in line:
+                lineuser = line.split("@")
+                user = lineuser[1].split(".")
+                if user in aktivuser:
+                    aktivuser.remove(user)
+                if user not in config.bots:  # not user not in aktivuser:
+                    print("GO OUT: " + user[0])
 
-            elif 'PING' in line:
+            if 'PING' in line:
                 s.send(bytes("PONG :tmi.twitch.tv  \r\n", "UTF-8"))
                 print('PONG')
-                continue
-
-            # if "QUIT" not in parts[0] and "JOIN" not in parts[0] and "PART" not in parts[0]:
-
-            elif line == "'":
-                continue
-            elif ':tmi.twitch.tv ' in line or config.nick in line:
-                print(time.strftime('%H:%M:%S >>> ') + thisUser + ": " + line)
-                continue
-            else:
-                continue
-            print(time.strftime('%H:%M:%S >>> ') + thisUser + ": " + message)
-
-
-            # Random Nachricht falls nichts im chat passiert
-            if (time.time() - lastMessageTime) >= (60 * 5):
-                lastMessageTime = time.time()
-                send_message(randomevent())
-            #live ausgabe hilfe für user
-            if (time.time() - lastChatUserTime) >= (60):
-                lastChatUserTime = time.time()
-                print(chatuser)
-                if chatuser != []:
-                    for x in chatuser:
-                        print(x.get('display-name'))
-
-
 
             # Normale KeyWords ohne Benutzer interaktion
             for KeyWord in config.KeyWords:
@@ -362,15 +320,15 @@ while True:
                         auswahlNummer = random.randint(0, len(config.KeyWords.get(KeyWord)) - 1)
                         auswahlNachrichten = config.KeyWords.get(KeyWord)
                         send_message(auswahlNachrichten[auswahlNummer])
-                        continue
+                        break
                     else:
                         send_message(config.KeyWords.get(KeyWord))
-                        continue
+                        break
 
             # Castom Keyworts mit Benutzer  interaktion
-            if (
-                    'hallo ' in message or 'moin ' in message or 'hi ' in message or 'huhu ' in message) and username == 'ReinekeWF':
+            if ('hallo ' in message or 'moin ' in message or 'hi ' in message or 'huhu ' in message) and thisUser != 'ReinekeWF':
                 '''
+                b'@badge-info=;badges=premium/1;color=#FF0000;display-name=PropanBen;emotes=;flags=;id=8c5c406f-f6bd-4e9e-a300-9c4b7174ffe6;login=propanben;mod=0;msg-id=raid;msg-param-displayName=PropanBen;msg-param-login=propanben;msg-param-profileImageURL=https://static-cdn.jtvnw.net/jtv_user_pictures/24f1472ec4884560-profile_image-70x70.png;msg-param-viewerCount=7;room-id=78953470;subscriber=0;system-msg=7\\sraiders\\sfrom\\sPropanBen\\shave\\sjoined!;tmi-sent-ts=1564231327156;user-id=124346119;user-type= :tmi.twitch.tv USERNOTICE #reyst
                 aktuellviewer = viewer()
                 newlistviewer =[]
                 for name in aktuellviewer:
@@ -391,6 +349,12 @@ while True:
 
 
             # hier sind die Commands zuhause
+
+            elif '!bits?' in message:
+                send_message('@'+thisUser+ ' hat ' + str(bits) + 'Bits gespendet!' )
+            elif '!sub?' in message:
+                send_message('@'+thisUser+ ' ist seit ' + str(subscribertime) + ' Monaten Sub!' )
+
             elif '!meister' in message:
                 send_message("Mein Meister ist ReinekeWF!")
 
@@ -417,7 +381,7 @@ while True:
 
 
             # Hier sind die hidden Commands zuhause
-            elif '!sendepause ' in message and thisUser == "ReinekeWF":
+            elif '!sendepause ' in message and (thisUser == "ReinekeWF" or streamer):
                 zeit = (int(message.split()[1]) + round(time.time()))
                 s.send(bytes(
                     "PRIVMSG #" + CHANNEL + " :" + 'Ok Fuchsi ist still für ' + message.split()[
@@ -425,7 +389,6 @@ while True:
                     "UTF-8"))
 
             elif message == '!exit' and thisUser == 'ReinekeWF':
-                config.cooldown = 0
                 send_message('Tschüss')
                 log.close()
                 s.shutdown(1)
