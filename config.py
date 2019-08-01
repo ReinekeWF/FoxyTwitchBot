@@ -1,8 +1,9 @@
+import  oauth as passw
 # Logindaten
 host = 'irc.chat.twitch.tv'
 port = 6667
 nick = 'kleinerfuchsbot'
-oauth = 'oauth:ry3j3g9bjqeuha80vthdseidwl7or'
+oauth = passw.oauth
 
 # Favorisirte Channel
 ChannelList = ['artimus83',
@@ -82,7 +83,7 @@ KeyWords = {'17 ' : 'Was 17? 17 Apfel?',
             'edge ' : 'Livin On The Edge by Aerosmith',
             'http:' : ('Fuchsi mag Links Wolfform','Hmmm ein Link! Oder doch lieber Selda?'),
             'https:' : ('Was? Link in Ketten? Warum?'),
-            'fuchs' : 'ich mag Füchse'
+            'fuchs ' : 'ich mag Füchse'
             }
 
 
