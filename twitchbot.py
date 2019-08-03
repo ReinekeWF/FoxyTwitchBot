@@ -22,11 +22,10 @@ PORT = config.port
 NICK = config.nick
 PASS = config.oauth
 
-log = open("log.txt", "a")
 
 timer = 0
 timerold = -1
-
+zaehler = 0
 
 def login():
     """login"""
@@ -135,6 +134,13 @@ def send_message(message):
         except:
             reconnect()
 
+def save(liste):
+    log = open("log.txt", "a")
+    for x in liste:
+        log.write(str(x.encode('UTF-8')) + "\n")
+    log.close()
+
+
 # pygame.init()
 # pygame.font.init()
 # font = pygame.font.Font('C:/Windows/Fonts/verdana.ttf',18)
@@ -171,10 +177,10 @@ while True:
     #    #send_message('TimerTest')
     #    startTimet = time.time()
 
-    time.sleep(1)
     ###################################
     try:
-        chat = str(s.recv(1024).decode("utf-8")).split('\\r\\n')
+        chats = str(s.recv(10000).decode("utf-8")).split('\r\n')
+        chat = chats[::1]
     except:
         reconnect()
 
@@ -185,7 +191,6 @@ while True:
     #live ausgabe hilfe für user
     if (time.time() - lastChatUserTime) >= (60):
         lastChatUserTime = time.time()
-        print(chatuser)
         if chatuser != []:
             print('-' * 20)
             for x in chatuser:
@@ -195,7 +200,10 @@ while True:
     for line in chat:
         if line not in oldchat:
             oldchat.append(line)
-            log.write(line + "\n")
+            if len(oldchat) >= 10:
+                save(oldchat)
+                oldchat.clear()
+
             if "PRIVMSG #" in line:
                 bots = False
                 for bot in config.bots:
@@ -271,7 +279,7 @@ while True:
                             turbo = True
                         else:
                             turbo = False
-                print(time.strftime('%H:%M:%S >>> ') + thisUser + ": " + line)
+                print(time.strftime('%H:%M:%S >>> ') + thisUser + ": " + message)
 
 
             if "JOIN #" in line:
@@ -286,8 +294,8 @@ while True:
                     # send_message("Willkommen " + user[0])
                     aktivuser.append(user[0])
 
-            if 'USERNOTICE' in line or ':tmi.twitch.tv ' in line or 'NOTICE #' in line: # b'@badge-info=subscriber/0;badges=subscriber/0,premium/1;color=#5F9EA0;display-name=SanderPrGa;emotes=;flags=;id=e43959c5-5c08-4cfc-8514-81139cb11ccc;login=sanderprga;mod=0;msg-id=sub;msg-param-cumulative-months=1;msg-param-months=0;msg-param-should-share-streak=0;msg-param-sub-plan-name=Channel\\sSubscription\\s(gronkh);msg-param-sub-plan=Prime;room-id=12875057;subscriber=1;system-msg=SanderPrGa\\ssubscribed\\swith\\sTwitch\\sPrime.;tmi-sent-ts=1564179542211;user-id=52257072;user-type= :tmi.twitch.tv USERNOTICE #gronkh
-                print("USERNOTICE")
+            if 'USERNOTICE #' in line or 'NOTICE #' in line: # b'@badge-info=subscriber/0;badges=subscriber/0,premium/1;color=#5F9EA0;display-name=SanderPrGa;emotes=;flags=;id=e43959c5-5c08-4cfc-8514-81139cb11ccc;login=sanderprga;mod=0;msg-id=sub;msg-param-cumulative-months=1;msg-param-months=0;msg-param-should-share-streak=0;msg-param-sub-plan-name=Channel\\sSubscription\\s(gronkh);msg-param-sub-plan=Prime;room-id=12875057;subscriber=1;system-msg=SanderPrGa\\ssubscribed\\swith\\sTwitch\\sPrime.;tmi-sent-ts=1564179542211;user-id=52257072;user-type= :tmi.twitch.tv USERNOTICE #gronkh
+                #print("USERNOTICE")
                 print(line)
 
                 if 'NOTICE #' in line:
@@ -312,7 +320,8 @@ while True:
             if 'PING' in line:
                 s.send(bytes("PONG :tmi.twitch.tv  \r\n", "UTF-8"))
                 print('PONG')
-
+            if '' in line:
+                continue
             # Normale KeyWords ohne Benutzer interaktion
             for KeyWord in config.KeyWords:
                 if KeyWord in message:
@@ -326,7 +335,7 @@ while True:
                         break
 
             # Castom Keyworts mit Benutzer  interaktion
-            if ('hallo ' in message or 'moin ' in message or 'hi ' in message or 'huhu ' in message) and thisUser != 'ReinekeWF':
+            if ('hallo ' in message or 'moin ' in message or 'hi ' in message or 'huhu ' in message or 'servus' in message) and thisUser != 'ReinekeWF':
                 '''
                 b'@badge-info=;badges=premium/1;color=#FF0000;display-name=PropanBen;emotes=;flags=;id=8c5c406f-f6bd-4e9e-a300-9c4b7174ffe6;login=propanben;mod=0;msg-id=raid;msg-param-displayName=PropanBen;msg-param-login=propanben;msg-param-profileImageURL=https://static-cdn.jtvnw.net/jtv_user_pictures/24f1472ec4884560-profile_image-70x70.png;msg-param-viewerCount=7;room-id=78953470;subscriber=0;system-msg=7\\sraiders\\sfrom\\sPropanBen\\shave\\sjoined!;tmi-sent-ts=1564231327156;user-id=124346119;user-type= :tmi.twitch.tv USERNOTICE #reyst
                 aktuellviewer = viewer()
@@ -354,6 +363,21 @@ while True:
                 send_message('@'+thisUser+ ' hat ' + str(bits) + 'Bits gespendet!' )
             elif '!sub?' in message:
                 send_message('@'+thisUser+ ' ist seit ' + str(subscribertime) + ' Monaten Sub!' )
+
+            elif '!sub' in message:
+                partsmessage = message.split(' ')
+                if '@' in partsmessage[1]:
+                    subuser = partsmessage[1].split('@')[1]
+                else:
+                    subuser = partsmessage[1]
+                print('test')
+                for x in chatuser:
+                    if subuser in x.get('display-name').lower():
+                        send_message(partsmessage[1] + ' ist seit ' + x.get('subscriber') + ' monaten sub!')
+                        break
+                    else:
+                        continue
+
 
             elif '!meister' in message:
                 send_message("Mein Meister ist ReinekeWF!")
@@ -390,7 +414,7 @@ while True:
 
             elif message == '!exit' and thisUser == 'ReinekeWF':
                 send_message('Tschüss')
-                log.close()
+                save(oldchat)
                 s.shutdown(1)
                 exit()
 
