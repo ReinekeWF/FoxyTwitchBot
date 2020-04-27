@@ -4,9 +4,12 @@ host = 'irc.chat.twitch.tv'
 port = 6667
 nick = 'kleinerfuchsbot'
 oauth = passw.oauth
+wellcomeMessage = False
+chatColor = 'SpringGreen'
 
 # Favorisirte Channel
-ChannelList = ['artimus83',
+ChannelList = [
+                'artimus83',
                'noobdevtv',
                'reinekewf',
                'traumfalke',
@@ -20,6 +23,7 @@ ChannelList = ['artimus83',
                's0pht',
                'phosphortv_',
                'larszauberer'
+
                ]
 
 # Twitchbots
@@ -40,17 +44,18 @@ bots = ['freast',
         'kleinerfuchsbot',
         's1faka',
         'n1cthegamer',
-        'vierneunundneunzig'
+        'vierneunundneunzig',
+        'streamlabs'
 
         ]
 
 geschenke = ['eine Rose',
-             'ein Gals voll Dreck',
+             'ein Glas voll Dreck',
              'einen Mob',
              'einene hustenden Aschenbecher',
              '30 Kronkorken',
              'einen Sack voll Flöhe',
-             'einen Block Windervoll steiniger Erde',
+             'einen Block Wundervollsteiniger Erde',
              'eine Uhr',
              'einen leeren USBstick mit pornos',
              'Abgebrannten Weihnachtsbaum vom Vorjahr',
@@ -83,7 +88,8 @@ KeyWords = {'17 ' : 'Was 17? 17 Apfel?',
             'edge ' : 'Livin On The Edge by Aerosmith',
             'http:' : ('Fuchsi mag Links Wolfform','Hmmm ein Link! Oder doch lieber Selda?'),
             'https:' : ('Was? Link in Ketten? Warum?'),
-            'fuchs ' : 'ich mag Füchse'
+            'fuchs ' : 'ich mag Füchse',
+            '???' : 'Fragezeichen sind keine Rudeltiere =^.^='
             }
 
 

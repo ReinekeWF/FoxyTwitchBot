@@ -4,11 +4,11 @@ import socket
 import requests
 import config
 import random
+import tkinter
 
 # import threading
 
 # import pygame
-# import tkinter
 message = ''
 chat = ''
 zeit = 0
@@ -27,6 +27,9 @@ timer = 0
 timerold = -1
 zaehler = 0
 
+
+#userexport = open("userexport.txt","a+")
+
 def login():
     """login"""
 
@@ -37,7 +40,7 @@ def login():
             stellen -= 1
         print(str(channelZaler) + ' ' * (stellen) + Channel)
         channelZaler += 1
-    auswahl = input('Channel name eingeben: ')
+    auswahl = input('Channel nummer oder name eingeben: ')
     try:
         CHANNEL = config.ChannelList[int(auswahl)]
     except:
@@ -55,6 +58,21 @@ def login():
     return CHANNEL
 
 
+def config_channel(wellcomeMessage,chatColor):
+
+    if wellcomeMessage != False:
+        send_message(wellcomeMessage)
+        time.sleep(0.05)
+
+    s.send(bytes("CAP REQ :twitch.tv/membership" + "\r\n", "UTF-8"))
+    time.sleep(0.05)
+    s.send(bytes("CAP REQ :twitch.tv/tags" + "\r\n", "UTF-8"))
+    time.sleep(0.05)
+    s.send(bytes("CAP REQ :twitch.tv/commands" + "\r\n", "UTF-8"))
+    if chatColor != '':
+        send_message("/color " + chatColor)
+
+
 def geschenk():
     """zufÃƒÂ¤lliges geschenk auswÃƒÂ¤hlen"""
 
@@ -66,6 +84,11 @@ def geschenk():
 def randomevent():
     auswahl = config.zufälligeNachrichten[random.randint(0, len(config.zufälligeNachrichten) - 1)]
     return auswahl
+
+def viewer_log(viewer):
+    viewer_datei = open('viewer.txt','a+')
+    viewer_datei.write(viewer + '\n')
+    viewer_datei.close()
 
 
 def viewer():
@@ -116,6 +139,18 @@ def reconnect():
     print("Erfolgreiche Verbindung zu Channel " + CHANNEL)
 
 
+def get_message():
+
+    try:
+        chats = str(s.recv(10000).\
+                    decode("utf-8")).\
+                    split('\r\n')
+        chat = chats[::1]
+    except:
+        reconnect()
+    return chat
+
+
 def send_message(message):
     """
     Args:
@@ -134,8 +169,13 @@ def send_message(message):
         except:
             reconnect()
 
+
+#def analyse_message(input_message):
+
+
+
 def save(liste):
-    log = open("log.txt", "a")
+    log = open("log2.txt", "a")
     for x in liste:
         log.write(str(x.encode('UTF-8')) + "\n")
     log.close()
@@ -154,20 +194,13 @@ startTime = time.time()
 
 
 CHANNEL = login()
-# send_message('Hallo der Bottige Fuchsi ist nun Online =^.^= ')
-time.sleep(0.05)
-s.send(bytes("CAP REQ :twitch.tv/membership" + "\r\n", "UTF-8"))
-time.sleep(0.05)
-s.send(bytes("CAP REQ :twitch.tv/tags" + "\r\n", "UTF-8"))
-time.sleep(0.05)
-s.send(bytes("CAP REQ :twitch.tv/commands" + "\r\n", "UTF-8"))
-aktivuser = []  # viewer()
-send_message("/color SpringGreen")
+config_channel(config.wellcomeMessage,config.chatColor)
 
 thisUser = 'Twitch'
 chatuser = []
 newUser = dict()
 aktuser = dict()
+aktivuser = list()
 
 # kampf = threading.Thread(target=kampffuchs())
 while True:
@@ -178,11 +211,7 @@ while True:
     #    startTimet = time.time()
 
     ###################################
-    try:
-        chats = str(s.recv(10000).decode("utf-8")).split('\r\n')
-        chat = chats[::1]
-    except:
-        reconnect()
+    chat = get_message()
 
     # Random Nachricht falls nichts im chat passiert
     if (time.time() - lastMessageTime) >= (60 * 10):
@@ -191,6 +220,7 @@ while True:
     #live ausgabe hilfe für user
     if (time.time() - lastChatUserTime) >= (60):
         lastChatUserTime = time.time()
+        #viewer_log(chatuser)
         if chatuser != []:
             print('-' * 20)
             for x in chatuser:
@@ -226,6 +256,7 @@ while True:
                                 newUser.update({str(key): valve})
                         thisUser = newUser.get('display-name')
                         usermode = newUser.get('badges')
+                        thisUserColor = newUser.get('color')
                         u = True
                         aktuser = newUser
                         if chatuser != []:
@@ -236,6 +267,8 @@ while True:
                                     continue
                         if u == True:
                             chatuser.append(newUser)
+                            #userexport.write(newUser)
+
                     lastMessageTime = time.time()
                 aktusermeta = aktuser.keys()
                 for x in aktusermeta:
@@ -279,7 +312,7 @@ while True:
                             turbo = True
                         else:
                             turbo = False
-                print(time.strftime('%H:%M:%S >>> ') + thisUser + ": " + message)
+                print(time.strftime('%H:%M:%S >>> ') + thisUserColor + thisUser + ": " + message)
 
 
             if "JOIN #" in line:
@@ -320,8 +353,6 @@ while True:
             if 'PING' in line:
                 s.send(bytes("PONG :tmi.twitch.tv  \r\n", "UTF-8"))
                 print('PONG')
-            if '' in line:
-                continue
             # Normale KeyWords ohne Benutzer interaktion
             for KeyWord in config.KeyWords:
                 if KeyWord in message:
@@ -359,12 +390,12 @@ while True:
 
             # hier sind die Commands zuhause
 
-            elif '!bits?' in message:
+            if '!bits?' in message:
                 send_message('@'+thisUser+ ' hat ' + str(bits) + 'Bits gespendet!' )
-            elif '!sub?' in message:
+            if '!sub?' in message:
                 send_message('@'+thisUser+ ' ist seit ' + str(subscribertime) + ' Monaten Sub!' )
 
-            elif '!sub' in message:
+            if '!sub' in message:
                 partsmessage = message.split(' ')
                 if '@' in partsmessage[1]:
                     subuser = partsmessage[1].split('@')[1]
@@ -379,40 +410,40 @@ while True:
                         continue
 
 
-            elif '!meister' in message:
+            if '!meister' in message:
                 send_message("Mein Meister ist ReinekeWF!")
 
-            elif '!commands' in message:
+            if '!commands' in message:
                 command = ' | '.join(config.listCommands)
                 send_message(command)
 
-            elif '!loben' in message:
+            if '!loben' in message:
                 send_message('/me Fuchsi fühlt sich gelobt! =^.^=')
 
-            elif '!geschenk ' in message:
+            if '!geschenk ' in message:
                 beschenkter = message.split(' ')[1]
                 send_message("@" + thisUser + ' schenkt ' + geschenk() + ' an @' + beschenkter)
 
-            elif message == '!git':
+            if message == '!git':
                 send_message('https://github.com/ReinekeWF/FoxyTwitchBot')
 
-            elif "!hype" in message:
+            if "!hype" in message:
                 send_message("HYPETRAIHN incomming")
 
-            elif "!fight" in message and thisUser == "ReinekeWF":
+            if "!fight" in message and thisUser == "ReinekeWF":
                 config.timerold = -1
                 config.kampfModus = -1
 
 
             # Hier sind die hidden Commands zuhause
-            elif '!sendepause ' in message and (thisUser == "ReinekeWF" or streamer):
+            if '!sendepause ' in message and (thisUser == "ReinekeWF" or streamer):
                 zeit = (int(message.split()[1]) + round(time.time()))
                 s.send(bytes(
                     "PRIVMSG #" + CHANNEL + " :" + 'Ok Fuchsi ist still für ' + message.split()[
                         1] + 'sekunden' + "\r\n",
                     "UTF-8"))
 
-            elif message == '!exit' and thisUser == 'ReinekeWF':
+            if message == '!exit' and thisUser == 'ReinekeWF':
                 send_message('Tschüss')
                 save(oldchat)
                 s.shutdown(1)
