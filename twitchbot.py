@@ -6,9 +6,6 @@ import config
 import random
 import tkinter
 
-# import threading
-
-# import pygame
 message = ''
 chat = ''
 zeit = 0
